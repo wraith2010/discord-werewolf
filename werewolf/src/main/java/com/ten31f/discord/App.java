@@ -1,7 +1,5 @@
 package com.ten31f.discord;
 
-import java.util.EnumSet;
-
 import javax.security.auth.login.LoginException;
 
 import com.ten31f.discord.bots.PingPongBot;
@@ -12,16 +10,13 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.utils.Compression;
-import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
 public class App {
 
 	public static void main(String[] args) throws LoginException, InterruptedException {
 
-		JDABuilder builder = new JDABuilder(args[0]);
+		JDABuilder builder = JDABuilder.createDefault(args[0]);
 
-		// Disable parts of the cache
-		builder.setDisabledCacheFlags(EnumSet.of(CacheFlag.ACTIVITY, CacheFlag.VOICE_STATE));
 		// Enable the bulk delete event
 		builder.setBulkDeleteSplittingEnabled(false);
 		// Disable compression (not recommended)
