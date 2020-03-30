@@ -1,0 +1,4 @@
+/werewolf/*.classpath
+/werewolf/*.project
+/werewolf/.settings/*.prefs
+/werewolf/target
