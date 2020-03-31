@@ -6,11 +6,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.ten31f.discord.bots.baseaction.PrivatePromptAction;
 import com.ten31f.discord.exceptions.GameStateException;
 import com.ten31f.discord.exceptions.NotEnoughPlayersException;
 
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 public class Game {
 
@@ -20,13 +22,15 @@ public class Game {
 		JOIN, SETUP, PLAY, END;
 	};
 
-	public Game(MessageChannel messageChannel) {
-		setMessageChannel(messageChannel);
-	}
-
 	private Map<String, Player> players = null;
 	private MessageChannel messageChannel = null;
 	private GameState gameState = GameState.JOIN;
+	private List<PrivatePromptAction> privatePromptActions = null;
+
+	public Game(MessageChannel messageChannel) {
+		setMessageChannel(messageChannel);
+		setPrivatePromptActions(new ArrayList<>());
+	}
 
 	public Map<String, Player> getPlayers() {
 		return players;
@@ -57,6 +61,18 @@ public class Game {
 			return 0;
 
 		return getPlayers().size();
+	}
+
+	public boolean isUserPlaying(User user) {
+		if (getPlayers() == null)
+			return false;
+
+		for (Player player : getPlayers().values()) {
+			if (user.equals(player.getUser()))
+				return true;
+		}
+
+		return false;
 	}
 
 	public void allIn() throws NotEnoughPlayersException, GameStateException {
@@ -91,7 +107,15 @@ public class Game {
 
 		playerList.forEach(player -> player.setRole(avalibleRoles.remove(0)));
 	}
-	
+
+	public void processPrivateMessageReceivedEvent(PrivateMessageReceivedEvent privateMessageReceivedEvent) {
+		for (PrivatePromptAction privatePromptAction : getPrivatePromptActions()) {
+			if (privateMessageReceivedEvent.getChannel().equals(privatePromptAction.getPrivateChannel())) {
+				privatePromptAction.processPrivateMessageReceivedEvent(privateMessageReceivedEvent);
+			}
+		}
+	}
+
 	public void startPlay() {
 		setGameState(GameState.PLAY);
 	}
@@ -111,4 +135,21 @@ public class Game {
 	public void setGameState(GameState gameState) {
 		this.gameState = gameState;
 	}
+
+	public List<PrivatePromptAction> getPrivatePromptActions() {
+		return privatePromptActions;
+	}
+
+	private void setPrivatePromptActions(List<PrivatePromptAction> privatePromptActions) {
+		this.privatePromptActions = privatePromptActions;
+	}
+
+	public void addPrivatePromptAction(PrivatePromptAction privatePromptAction) {
+		getPrivatePromptActions().add(privatePromptAction);
+	}
+
+	public void clearPrivatePromptActions() {
+		getPrivatePromptActions().clear();
+	}
+
 }

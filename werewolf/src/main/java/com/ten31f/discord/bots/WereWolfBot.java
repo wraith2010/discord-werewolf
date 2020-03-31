@@ -4,10 +4,12 @@ import com.ten31f.discord.bots.action.AllInAction;
 import com.ten31f.discord.bots.action.JoinGameAction;
 import com.ten31f.discord.bots.action.KillGameAction;
 import com.ten31f.discord.bots.action.StartGameAction;
+import com.ten31f.discord.exceptions.NoGameException;
 import com.ten31f.discord.repo.GamesRepo;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class WereWolfBot extends ListenerAdapter {
@@ -45,6 +47,18 @@ public class WereWolfBot extends ListenerAdapter {
 			getAllInAction().process(messageReceivedEvent);
 			break;
 		default:
+		}
+
+	}
+
+	@Override
+	public void onPrivateMessageReceived(PrivateMessageReceivedEvent privateMessageReceivedEvent) {
+
+		try {
+			getGamesRepo().processPrivateMessageReceivedEvent(privateMessageReceivedEvent);
+		} catch (NoGameException noGameException) {
+			privateMessageReceivedEvent.getChannel()
+					.sendMessage(NoGameException.generateMessage(privateMessageReceivedEvent.getAuthor())).queue();
 		}
 
 	}

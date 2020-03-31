@@ -7,6 +7,7 @@ import com.ten31f.discord.elements.Game;
 import com.ten31f.discord.exceptions.NoGameException;
 
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 public class GamesRepo {
 
@@ -34,7 +35,6 @@ public class GamesRepo {
 		getGames().put(messageChannel.getId(), game);
 
 		return game;
-
 	}
 
 	public Game removeGame(MessageChannel messageChannel) throws NoGameException {
@@ -61,6 +61,16 @@ public class GamesRepo {
 		}
 
 		return getGames().get(messageChannel.getId());
+	}
+
+	public void processPrivateMessageReceivedEvent(PrivateMessageReceivedEvent privateMessageReceivedEvent)
+			throws NoGameException {
+		if (getGames() == null) {
+			throw new NoGameException();
+		}
+
+		getGames().values().stream().filter(game -> game.isUserPlaying(privateMessageReceivedEvent.getAuthor()))
+				.forEach(game -> game.processPrivateMessageReceivedEvent(privateMessageReceivedEvent));
 	}
 
 }

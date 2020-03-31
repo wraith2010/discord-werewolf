@@ -1,4 +1,4 @@
-package com.ten31f.discord.bots.action;
+package com.ten31f.discord.bots.baseaction;
 
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 

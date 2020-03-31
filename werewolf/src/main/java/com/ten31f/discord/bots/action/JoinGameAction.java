@@ -1,5 +1,6 @@
 package com.ten31f.discord.bots.action;
 
+import com.ten31f.discord.bots.baseaction.ResponseAction;
 import com.ten31f.discord.elements.Game;
 import com.ten31f.discord.exceptions.NoGameException;
 import com.ten31f.discord.repo.GamesRepo;
