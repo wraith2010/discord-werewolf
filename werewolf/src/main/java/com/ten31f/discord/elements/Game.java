@@ -19,7 +19,7 @@ public class Game {
 	public static final int MINIMUM_PLAYERS = 2;
 
 	public static enum GameState {
-		JOIN, SETUP, PLAY, END;
+		JOIN, SETUP, DAY_ONE_NARRATION, DAY_NARRATION, DAY_CHAOS, DAY_CONCLUSION, NIGHT, END;
 	};
 
 	private Map<String, Player> players = null;
@@ -116,10 +116,6 @@ public class Game {
 		}
 	}
 
-	public void startPlay() {
-		setGameState(GameState.PLAY);
-	}
-
 	public MessageChannel getMessageChannel() {
 		return messageChannel;
 	}
@@ -133,7 +129,31 @@ public class Game {
 	}
 
 	public void setGameState(GameState gameState) {
+
 		this.gameState = gameState;
+
+//		switch (getGameState()) {
+//		case DAY_CHAOS:
+//			break;
+//		case DAY_CONCLUSION:
+//			break;
+//		case DAY_NARRATION:
+//			break;
+//		case DAY_ONE_NARRATION:
+//			break;
+//		case END:
+//			break;
+//		case JOIN:
+//			break;
+//		case NIGHT:
+//			break;
+//		case SETUP:
+//			setupGame();
+//			break;
+//		default:
+//			break;
+//		}
+
 	}
 
 	public List<PrivatePromptAction> getPrivatePromptActions() {
