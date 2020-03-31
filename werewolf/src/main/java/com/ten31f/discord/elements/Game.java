@@ -1,6 +1,9 @@
 package com.ten31f.discord.elements;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.ten31f.discord.exceptions.GameStateException;
@@ -11,35 +14,38 @@ import net.dv8tion.jda.api.entities.User;
 
 public class Game {
 
-	public static final int MINIMUM_PLAYERS = 5;
+	public static final int MINIMUM_PLAYERS = 2;
 
 	public static enum GameState {
-		JOIN, SETUP, DAY, NIGHT, END;
+		JOIN, SETUP, PLAY, END;
 	};
 
 	public Game(MessageChannel messageChannel) {
 		setMessageChannel(messageChannel);
 	}
 
-	private Map<String, User> players = null;
+	private Map<String, Player> players = null;
 	private MessageChannel messageChannel = null;
 	private GameState gameState = GameState.JOIN;
 
-	public Map<String, User> getPlayers() {
+	public Map<String, Player> getPlayers() {
 		return players;
 	}
 
-	private void setPlayers(Map<String, User> players) {
+	private void setPlayers(Map<String, Player> players) {
 		this.players = players;
 	}
 
 	public boolean addPlayer(User user) {
 
 		if (getPlayers() == null)
-			setPlayers(new HashMap<String, User>());
+			setPlayers(new HashMap<String, Player>());
 
 		if (!getPlayers().containsKey(user.getId())) {
-			getPlayers().put(user.getId(), user);
+
+			Player player = new Player(user);
+
+			getPlayers().put(user.getId(), player);
 			return true;
 		}
 
@@ -63,6 +69,31 @@ public class Game {
 					String.format("We need more players to start we only have %s/%s", playerCount(), MINIMUM_PLAYERS));
 
 		setGameState(GameState.SETUP);
+	}
+
+	/*
+	 * Initial game. Assign roles.
+	 */
+	public void setupGame() {
+		// Convert all Map values to a List
+		List<Player> playerList = new ArrayList<>(getPlayers().values());
+		List<Role> avalibleRoles = new ArrayList<>();
+
+		avalibleRoles.add(Role.SEER);
+		avalibleRoles.add(Role.WEREWOLF);
+		avalibleRoles.add(Role.WEREWOLF);
+
+		while (avalibleRoles.size() < playerList.size()) {
+			avalibleRoles.add(Role.VILLAGER);
+		}
+
+		Collections.shuffle(avalibleRoles);
+
+		playerList.forEach(player -> player.setRole(avalibleRoles.remove(0)));
+	}
+	
+	public void startPlay() {
+		setGameState(GameState.PLAY);
 	}
 
 	public MessageChannel getMessageChannel() {

@@ -7,11 +7,11 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-public class StartGameAction implements Action {
+public class StartGameAction implements ResponseAction {
 
 	public static final String PHRASE_START_GAME = "!play werewolf";
 
-	private static final String RESPONSE_STARTING = "Pitter patter lets get at’er! You have %s to join";
+	private static final String RESPONSE_STARTING = "Pitter patter lets get at’er!";
 	private static final String RESPONSE_ALREADY_PLAYING = "Sorry only one game of werewolf at time per channel.";
 
 	private GamesRepo gamesRepo = null;

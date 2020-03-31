@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-public class KillGameAction implements Action {
+public class KillGameAction implements ResponseAction {
 
 	public static final String PHRASE_KILL_GAME = "!end werewolf";
 

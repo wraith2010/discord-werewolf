@@ -37,8 +37,8 @@ public class GamesRepo {
 
 	}
 
-	public Game removeGame(MessageChannel messageChannel) throws NoGameException {		
-		
+	public Game removeGame(MessageChannel messageChannel) throws NoGameException {
+
 		if (getGames() == null) {
 			throw new NoGameException();
 		}

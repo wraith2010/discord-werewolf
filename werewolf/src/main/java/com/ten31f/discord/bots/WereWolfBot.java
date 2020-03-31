@@ -1,5 +1,6 @@
 package com.ten31f.discord.bots;
 
+import com.ten31f.discord.bots.action.AllInAction;
 import com.ten31f.discord.bots.action.JoinGameAction;
 import com.ten31f.discord.bots.action.KillGameAction;
 import com.ten31f.discord.bots.action.StartGameAction;
@@ -15,12 +16,14 @@ public class WereWolfBot extends ListenerAdapter {
 	private JoinGameAction joinGameAction = null;
 	private StartGameAction startGameAction = null;
 	private KillGameAction killGameAction = null;
+	private AllInAction allInAction = null;
 
 	public WereWolfBot() {
 		setGamesRepo(new GamesRepo());
 		setJoinGameAction(new JoinGameAction(getGamesRepo()));
 		setStartGameAction(new StartGameAction(getGamesRepo()));
 		setKillGameAction(new KillGameAction(getGamesRepo()));
+		setAllInAction(new AllInAction(getGamesRepo()));
 	}
 
 	@Override
@@ -37,6 +40,9 @@ public class WereWolfBot extends ListenerAdapter {
 			break;
 		case JoinGameAction.PHRASE_JOIN_GAME:
 			getJoinGameAction().process(messageReceivedEvent);
+			break;
+		case AllInAction.PHRASE_START_GAME:
+			getAllInAction().process(messageReceivedEvent);
 			break;
 		default:
 		}
@@ -73,6 +79,14 @@ public class WereWolfBot extends ListenerAdapter {
 
 	private void setKillGameAction(KillGameAction killGameAction) {
 		this.killGameAction = killGameAction;
+	}
+
+	private AllInAction getAllInAction() {
+		return allInAction;
+	}
+
+	private void setAllInAction(AllInAction allInAction) {
+		this.allInAction = allInAction;
 	}
 
 }
