@@ -3,6 +3,7 @@ package com.ten31f.discord;
 import javax.security.auth.login.LoginException;
 
 import com.ten31f.discord.bots.PingPongBot;
+import com.ten31f.discord.bots.TestBot;
 import com.ten31f.discord.bots.WereWolfBot;
 import com.ten31f.discord.eventlisteners.ReadyListener;
 
@@ -26,7 +27,11 @@ public class App {
 
 		builder.addEventListeners(new ReadyListener());
 		builder.addEventListeners(new PingPongBot());
-		builder.addEventListeners(new WereWolfBot());
+
+		WereWolfBot wereWolfBot = new WereWolfBot();
+
+		builder.addEventListeners(wereWolfBot);
+		builder.addEventListeners(new TestBot(wereWolfBot));
 
 		JDA jda = builder.build();
 

@@ -2,7 +2,7 @@ package com.ten31f.discord.bots.action;
 
 import com.ten31f.discord.bots.baseaction.ResponseAction;
 import com.ten31f.discord.elements.Game;
-import com.ten31f.discord.elements.Player;
+import com.ten31f.discord.elements.GameState;
 import com.ten31f.discord.exceptions.GameStateException;
 import com.ten31f.discord.exceptions.NoGameException;
 import com.ten31f.discord.exceptions.NotEnoughPlayersException;
@@ -34,11 +34,9 @@ public class AllInAction implements ResponseAction {
 			Game game = getGamesRepo().getGame(messageChannel);
 			game.allIn();
 
-			messageChannel.sendMessage(RESPONSE_LETS_GO).queue();
+			messageChannel.sendMessage(RESPONSE_LETS_GO).complete();
 
-			game.setupGame();
-			
-			notifyPlayersOfRoles(game);
+			game.setGameState(GameState.SETUP);
 
 		} catch (NoGameException noGameException) {
 			messageChannel.sendMessage(NoGameException.generateMessage(user)).queue();
@@ -46,20 +44,6 @@ public class AllInAction implements ResponseAction {
 			messageChannel.sendMessage(notEnoughPlayersException.getMessage()).queue();
 		} catch (GameStateException gameStateException) {
 			messageChannel.sendMessage(gameStateException.getMessage()).queue();
-		}
-
-	}
-
-	private void notifyPlayersOfRoles(Game game) {
-
-		String msg = "You are are: a %s this game.\nDetails: %s";
-
-		for (Player player : game.getPlayers().values()) {
-
-			player.getUser().openPrivateChannel().queue(channel -> {
-				channel.sendMessage(String.format(msg, player.getRole().getName(), player.getRole().getPower()))
-						.queue();
-			});
 		}
 
 	}

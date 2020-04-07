@@ -1,20 +1,20 @@
 package com.ten31f.discord.bots.action;
 
-import java.util.List;
+import java.awt.Color;
 import java.util.stream.Collectors;
 
 import com.ten31f.discord.bots.baseaction.PrivatePromptAction;
 import com.ten31f.discord.elements.Game;
 import com.ten31f.discord.elements.Player;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 public class SeerAction extends PrivatePromptAction {
 
-	private static final String PROMPT_SEER_CHECK = "Okay Seer who do you want to check?";
-
-	private List<Player> targetPlayers = null;
+	private static final String TITLE = "Seer Check";
+	private static final String PROMPT_SEER_CHECK = "Okay Seer, who do you want to check?";
 
 	public SeerAction(User user, Game game) {
 		super(user, game);
@@ -37,21 +37,18 @@ public class SeerAction extends PrivatePromptAction {
 			stringBuilder.append(String.format("%s.) %s\n", index, player.getUser().getName()));
 		}
 
-		getPrivateChannel().sendMessage(stringBuilder.toString()).complete();
+		EmbedBuilder embedBuilder = new EmbedBuilder();
+		embedBuilder.setTitle(TITLE);
+		embedBuilder.setColor(Color.CYAN);
+		embedBuilder.setDescription(stringBuilder.toString());
+
+		getPrivateChannel().sendMessage(embedBuilder.build()).queue();
 	}
-	
+
 	@Override
 	public void processPrivateMessageReceivedEvent(PrivateMessageReceivedEvent privateMessageReceivedEvent) {
-		// TODO Auto-generated method stub
 		
-	}
 
-	private List<Player> getTargetPlayers() {
-		return targetPlayers;
-	}
-
-	private void setTargetPlayers(List<Player> targetPlayers) {
-		this.targetPlayers = targetPlayers;
 	}
 
 }

@@ -68,7 +68,7 @@ public class GamesRepo {
 		if (getGames() == null) {
 			throw new NoGameException();
 		}
-
+		
 		getGames().values().stream().filter(game -> game.isUserPlaying(privateMessageReceivedEvent.getAuthor()))
 				.forEach(game -> game.processPrivateMessageReceivedEvent(privateMessageReceivedEvent));
 	}

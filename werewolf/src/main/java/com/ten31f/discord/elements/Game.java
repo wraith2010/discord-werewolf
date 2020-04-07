@@ -1,11 +1,17 @@
 package com.ten31f.discord.elements;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
+import com.ten31f.discord.bots.action.FirstDayNaration;
+import com.ten31f.discord.bots.action.SetupAction;
+import com.ten31f.discord.bots.action.VotingRound;
 import com.ten31f.discord.bots.baseaction.PrivatePromptAction;
 import com.ten31f.discord.exceptions.GameStateException;
 import com.ten31f.discord.exceptions.NotEnoughPlayersException;
@@ -16,20 +22,22 @@ import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 public class Game {
 
+	private static final Logger LOGGER = Logger.getLogger(Game.class.getName());
+
 	public static final int MINIMUM_PLAYERS = 2;
 
-	public static enum GameState {
-		JOIN, SETUP, DAY_ONE_NARRATION, DAY_NARRATION, DAY_CHAOS, DAY_CONCLUSION, NIGHT, END;
-	};
+	private Random random = null;
+
+	private MessageChannel messageChannel = null;
+	private GameState gameState = GameState.JOIN;	
+	private List<PrivatePromptAction> privatePromptActions = null;
 
 	private Map<String, Player> players = null;
-	private MessageChannel messageChannel = null;
-	private GameState gameState = GameState.JOIN;
-	private List<PrivatePromptAction> privatePromptActions = null;
 
 	public Game(MessageChannel messageChannel) {
 		setMessageChannel(messageChannel);
 		setPrivatePromptActions(new ArrayList<>());
+		setRandom(new Random(System.currentTimeMillis()));
 	}
 
 	public Map<String, Player> getPlayers() {
@@ -87,33 +95,15 @@ public class Game {
 		setGameState(GameState.SETUP);
 	}
 
-	/*
-	 * Initial game. Assign roles.
-	 */
-	public void setupGame() {
-		// Convert all Map values to a List
-		List<Player> playerList = new ArrayList<>(getPlayers().values());
-		List<Role> avalibleRoles = new ArrayList<>();
-
-		avalibleRoles.add(Role.SEER);
-		avalibleRoles.add(Role.WEREWOLF);
-		avalibleRoles.add(Role.WEREWOLF);
-
-		while (avalibleRoles.size() < playerList.size()) {
-			avalibleRoles.add(Role.VILLAGER);
-		}
-
-		Collections.shuffle(avalibleRoles);
-
-		playerList.forEach(player -> player.setRole(avalibleRoles.remove(0)));
-	}
-
 	public void processPrivateMessageReceivedEvent(PrivateMessageReceivedEvent privateMessageReceivedEvent) {
-		for (PrivatePromptAction privatePromptAction : getPrivatePromptActions()) {
+
+		for (Iterator<PrivatePromptAction> iterator = getPrivatePromptActions().iterator(); iterator.hasNext();) {
+			PrivatePromptAction privatePromptAction = iterator.next();
 			if (privateMessageReceivedEvent.getChannel().equals(privatePromptAction.getPrivateChannel())) {
 				privatePromptAction.processPrivateMessageReceivedEvent(privateMessageReceivedEvent);
 			}
 		}
+
 	}
 
 	public MessageChannel getMessageChannel() {
@@ -132,28 +122,51 @@ public class Game {
 
 		this.gameState = gameState;
 
-//		switch (getGameState()) {
-//		case DAY_CHAOS:
-//			break;
-//		case DAY_CONCLUSION:
-//			break;
-//		case DAY_NARRATION:
-//			break;
-//		case DAY_ONE_NARRATION:
-//			break;
-//		case END:
-//			break;
-//		case JOIN:
-//			break;
-//		case NIGHT:
-//			break;
-//		case SETUP:
-//			setupGame();
-//			break;
-//		default:
-//			break;
-//		}
+		switch (gameState) {
+		case DAY_CHAOS:
+			new Thread(new VotingRound(this)).start();
+			break;
+		case DAY_CONCLUSION:
+			break;
+		case DAY_NARRATION:
+			break;
+		case DAY_ONE_NARRATION:
+			new Thread(new FirstDayNaration(this)).start();
+			break;
+		case END:
+			break;
+		case JOIN:
+			break;
+		case NIGHT:
+			break;
+		case SETUP:
+			new Thread(new SetupAction(this)).start();
+			break;
+		default:
+			break;
+		}
 
+	}
+
+	public Player getRandomPlayer() {
+
+		int index = getRandom().nextInt(getPlayers().size());
+
+		return (Player) getPlayers().values().toArray()[index];
+
+	}
+
+	public Player getRandomAlivePlayer() {
+
+		List<Player> alivePlayers = getAlivePlayers();
+
+		int index = getRandom().nextInt(alivePlayers.size());
+
+		return alivePlayers.get(index);
+	}
+
+	public List<Player> getAlivePlayers() {
+		return getPlayers().values().stream().filter(Player::isAlive).collect(Collectors.toList());
 	}
 
 	public List<PrivatePromptAction> getPrivatePromptActions() {
@@ -168,8 +181,20 @@ public class Game {
 		getPrivatePromptActions().add(privatePromptAction);
 	}
 
+	public void removePrivatePromptAction(PrivatePromptAction privatePromptAction) {
+		getPrivatePromptActions().remove(privatePromptAction);
+	}
+
 	public void clearPrivatePromptActions() {
 		getPrivatePromptActions().clear();
+	}
+
+	private Random getRandom() {
+		return random;
+	}
+
+	private void setRandom(Random random) {
+		this.random = random;
 	}
 
 }

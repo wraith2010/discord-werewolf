@@ -1,18 +1,27 @@
 package com.ten31f.discord.bots;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.ten31f.discord.bots.action.AllInAction;
 import com.ten31f.discord.bots.action.JoinGameAction;
 import com.ten31f.discord.bots.action.KillGameAction;
 import com.ten31f.discord.bots.action.StartGameAction;
+import com.ten31f.discord.elements.Game;
 import com.ten31f.discord.exceptions.NoGameException;
 import com.ten31f.discord.repo.GamesRepo;
 
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class WereWolfBot extends ListenerAdapter {
+
+	private static final String BOT_USERNAME = "WereWolf";
+
+	private static final Logger LOGGER = Logger.getLogger(Game.class.getName());
 
 	private GamesRepo gamesRepo = null;
 	private JoinGameAction joinGameAction = null;
@@ -54,6 +63,15 @@ public class WereWolfBot extends ListenerAdapter {
 	@Override
 	public void onPrivateMessageReceived(PrivateMessageReceivedEvent privateMessageReceivedEvent) {
 
+		String message = privateMessageReceivedEvent.getMessage().getContentRaw();
+		String author = privateMessageReceivedEvent.getAuthor().getName();
+
+		// don't read your own message
+		if (BOT_USERNAME.equals(author))
+			return;
+
+		LOGGER.log(Level.INFO, String.format("%s->%s", author, message));
+
 		try {
 			getGamesRepo().processPrivateMessageReceivedEvent(privateMessageReceivedEvent);
 		} catch (NoGameException noGameException) {
@@ -69,6 +87,10 @@ public class WereWolfBot extends ListenerAdapter {
 
 	private JoinGameAction getJoinGameAction() {
 		return joinGameAction;
+	}
+
+	public Game newGame(MessageChannel messageChannel) {
+		return getGamesRepo().newGame(messageChannel);
 	}
 
 	private GamesRepo getGamesRepo() {

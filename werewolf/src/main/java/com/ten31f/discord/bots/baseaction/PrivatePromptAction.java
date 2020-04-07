@@ -1,6 +1,9 @@
 package com.ten31f.discord.bots.baseaction;
 
+import java.util.List;
+
 import com.ten31f.discord.elements.Game;
+import com.ten31f.discord.elements.Player;
 
 import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -13,6 +16,8 @@ public abstract class PrivatePromptAction extends ListenerAdapter {
 	private User user = null;
 	private Game game = null;
 	private PrivateChannel privateChannel = null;
+
+	private List<Player> targetPlayers = null;
 
 	abstract public void prompt();
 
@@ -56,6 +61,14 @@ public abstract class PrivatePromptAction extends ListenerAdapter {
 
 	private void setGame(Game game) {
 		this.game = game;
+	}
+
+	protected void setTargetPlayers(List<Player> targetPlayers) {
+		this.targetPlayers = targetPlayers;
+	}
+
+	protected List<Player> getTargetPlayers() {
+		return targetPlayers;
 	}
 
 }
